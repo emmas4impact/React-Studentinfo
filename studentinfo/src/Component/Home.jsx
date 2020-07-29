@@ -3,9 +3,9 @@ import React, {Component} from 'react';
 import Card from 'react-bootstrap/Card';
 import  Row from 'react-bootstrap/Row';
 import  Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav'
+
 import Container from 'react-bootstrap/Container'
-import {Link} from 'react-router-dom';
+
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Table from 'react-bootstrap/Table'
 
@@ -53,19 +53,7 @@ class Home extends Component {
         console.log(this.state.LastFiveProject)
         return(
             <>
-            <Nav variant="tabs" defaultActiveKey="/home">
-                <Nav.Item>
-                    <Nav.Link href="/home">Home</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="link-1">Students</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="link-2">
-                   Projects
-                    </Nav.Link>
-                </Nav.Item>
-            </Nav>
+            
             <Container style={{marginTop: "50px"}}>
             <Jumbotron>
                 <h1>
