@@ -3,11 +3,12 @@ import React, {Component} from 'react';
 import Card from 'react-bootstrap/Card';
 import  Row from 'react-bootstrap/Row';
 import  Col from 'react-bootstrap/Col';
-
+import Modal from 'react-bootstrap/Modal'
 import Container from 'react-bootstrap/Container'
-
+import Form from 'react-bootstrap/Form'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Table from 'react-bootstrap/Table'
+import Button from 'react-bootstrap/Button'
 
 class Student extends Component {
     
@@ -16,7 +17,18 @@ class Student extends Component {
         Total: 0,
         Projects: [],
         totalProject: 0,
-        limit: 5
+        limit: 5,
+        show: false,
+        student:{
+            firstname: "",
+            surname: "",
+            email: "",
+            dateofbirth: ""
+        },
+        isLoading: false,
+        errMess: ""
+        
+
     }
     
     componentDidMount = async () =>{
@@ -40,6 +52,60 @@ class Student extends Component {
        
     }
     
+     handleClose = () => {
+         this.setState({
+             show: false
+         })
+     };
+     handleShow = () => {
+        this.setState({
+            show: true
+        })
+     }
+     saveStudent = async(e) =>{
+        e.preventDefault()
+        const resp = await fetch("http://localhost:3457/students",{
+            method: "POST",
+            body: JSON.stringify(this.state.student),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        
+        if(resp.ok){
+            alert("New Student Added!");
+            
+            this.setState({
+                isLoading: false,
+                errMess: "",
+                student:{
+                    firstname: "",
+                    surname: "",
+                    email: "",
+                    dateofbirth: ""
+                }
+            })
+            
+        }else{
+            let json =await resp.json();
+            this.setState({
+                isLoading: false,
+                errMess: json.message
+            })
+        }
+         
+     }
+     handleChange=(input) =>{
+        let student =this.state.student;
+        let currentId = input.currentTarget.id;
+        
+        if(currentId){
+            student[currentId] =input.currentTarget.value;
+        }
+        
+        this.setState({product: student})
+     }
+    
     render(){
       
         return(
@@ -47,11 +113,12 @@ class Student extends Component {
             
             <Container style={{marginTop: "50px"}}>
             <Jumbotron>
-               <h1>List Of All Students</h1>     
+               <h1>List Of All Students</h1>  
+               <div style={{ display: "flex"}} onClick={this.handleShow}><Button>Add Student</Button></div>   
             </Jumbotron>
             <Row>
-                <Col md={3} className=" col col-md-4"> 
               {this.state.students.map(student=>(
+                <Col md={4} className="mb-4"> 
                   <Card style={{ width: '18rem' }} key={student._id}>
                 <Card.Img variant="top" src="https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fd3v0px0pttie1i.cloudfront.net%2Fuploads%2Fuser%2Flogo%2F2760563%2Fopengraph_3b24453d.png%3Fsource%3Dopengraph" />
                 <Card.Body>
@@ -66,8 +133,8 @@ class Student extends Component {
                 </Card.Body>
             </Card>
             
-            ))}
             </Col>
+            ))}
             </Row>
             <div style={{marginTop: "50px"}}><h1>Projects</h1> </div>
             <Table striped bordered hover >
@@ -98,7 +165,53 @@ class Student extends Component {
                 </Table>
             </Container>
                   
-                
+            <Modal show={this.state.show} onHide={this.handleClose}>
+                <Modal.Header closeButton>
+                <Modal.Title>Add Student</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Row>
+                            <Col>
+                            <Form.Control type="text" id="firstname" 
+                            placeholder="First name"
+                            value={this.state.student.firstname}
+                             onChange={this.handleChange}/>
+                            </Col>
+                            <Col>
+                            <Form.Control type="text" id="surname"
+                            placeholder="Last name" 
+                            value={this.state.student.surname}
+                            onChange={this.handleChange}/>
+                            </Col>
+                            
+                        </Row>
+                        <Row>
+                            <Col>
+                            <Form.Control type="email" id="email" 
+                            placeholder="email"
+                            value={this.state.student.email}
+                             onChange={this.handleChange}/>
+                            </Col>
+                            <Col>
+                            <Form.Control type="date"  id="dateofbirth" 
+                            placeholder="date Of birth" 
+                            value={this.state.student.dateofbirth}
+                            onChange={this.handleChange}/>
+                            </Col>
+                            
+                        </Row>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleClose}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={this.saveStudent}>
+                    Save Changes
+                </Button>
+                </Modal.Footer>
+            </Modal>
                 
 
           
