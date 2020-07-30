@@ -3,12 +3,29 @@ import React, {Component} from 'react';
 import Card from 'react-bootstrap/Card';
 import  Row from 'react-bootstrap/Row';
 import  Col from 'react-bootstrap/Col';
-
+import Spinner from 'react-bootstrap/Spinner'
 import Container from 'react-bootstrap/Container'
-
+import {connect} from 'react-redux'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Table from 'react-bootstrap/Table'
 
+
+const mapStateToProps = (state) => state;
+
+const mapDispatchToProps = (dispatch) => ({
+  setLoading: () =>
+    dispatch({
+      type: "SET_LOADING",
+      payload: true
+      
+    }),
+  endLoading: () =>
+    dispatch({
+      type: "STOP_LOADING",
+      payload: false
+      
+    }),
+});
 class Home extends Component {
     
     state={
@@ -16,24 +33,28 @@ class Home extends Component {
         Total: 0,
         LastFiveProject: [],
         totalProject: 0,
-        limit: 5
+        limit: 5,
+        //isLoading: true
     }
     
     componentDidMount = async () =>{
+        
         const response = await fetch("http://localhost:3457/students")
         const data = await response.json()
         
         console.log(data)
         this.setState({
             students: data.Students,
-            Total: data.Total
+            Total: data.Total,
+           //isLoading: this.props.isLoading()
         })
 
         const resp = await fetch("http://localhost:3457/projects")
         const project = await resp.json()
         this.setState({
             
-            totalProject: project.total
+            totalProject: project.total,
+            //isLoading:  this.props.isLoading()
         })
         
         const limit= this.state.limit
@@ -47,10 +68,11 @@ class Home extends Component {
         this.setState({
             LastFiveProject: lastPro.projects
         })
+        this.props.endLoading()
     }
     
     render(){
-        console.log(this.state.LastFiveProject)
+        console.log(this.props)
         return(
             <>
             
@@ -66,8 +88,18 @@ class Home extends Component {
                 
             </Jumbotron>
             <Row>
-                <Col md={3} className=" col col-md-4"> 
+            {
+          this.props.isLoading && (
+            
+              <div className="ml-2">
+                <Spinner animation="border" variant="success" />
+              </div>
+           
+           )
+        }
+            {/* {this.props.endLoading} */}
               {this.state.students.map(student=>(
+                  <Col md={4} sm={6} className="mb-4"> 
                   <Card style={{ width: '18rem' }} key={student._id}>
                 <Card.Img variant="top" src="https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fd3v0px0pttie1i.cloudfront.net%2Fuploads%2Fuser%2Flogo%2F2760563%2Fopengraph_3b24453d.png%3Fsource%3Dopengraph" />
                 <Card.Body>
@@ -82,9 +114,12 @@ class Home extends Component {
                 </Card.Body>
             </Card>
             
-            ))}
             </Col>
+            ))}
             </Row>
+           
+         
+            
             <div style={{marginTop: "50px"}}><h1>Projects</h1> </div>
             <Table striped bordered hover >
                 <thead>
@@ -97,6 +132,14 @@ class Home extends Component {
                     <th>StudentID</th>
                     </tr>
                 </thead>
+                { this.props.isLoading && (
+            
+            <div className="ml-2">
+              <Spinner animation="border" variant="success" />
+            </div>
+         
+         )
+      }
                 {this.state.LastFiveProject.map(project=>(
                     
                     <tbody key={project._id}>
@@ -123,4 +166,4 @@ class Home extends Component {
     }
 }
 
-export default Home;
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
