@@ -9,7 +9,37 @@ import Form from 'react-bootstrap/Form'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
+import { connect } from "react-redux";
 
+
+const mapStateToProps = (state) => state;
+
+const mapDispatchToProps = (dispatch) => ({
+//   getStudent: (students) => {
+//     dispatch({
+//       type: "GET_STUDENT",
+//       payload: students,
+//     });
+// },
+
+getStudentThunk: (students) => dispatch(getStudentWithThunk(students)),
+});
+const getStudentWithThunk = (students) => {
+    
+    return async(dispatch, getState) => {
+        const data= await fetch("http://localhost:3457/students")
+        //students = await data.json()
+        students  = await data.json()
+        console.log("hello", students)
+        console.log("A thunk was used to dispatch this action", getState());
+        dispatch({
+            type: "GET_STUDENT",
+            payload: students,
+        });
+      //async code
+      //debugger
+    };
+  };
 class Student extends Component {
     
     state={
@@ -103,7 +133,7 @@ class Student extends Component {
             student[currentId] =input.currentTarget.value;
         }
         
-        this.setState({product: student})
+        this.setState({student: student})
      }
     
     render(){
@@ -220,4 +250,4 @@ class Student extends Component {
     }
 }
 
-export default Student;
+export default connect(mapStateToProps, mapDispatchToProps)(Student);
