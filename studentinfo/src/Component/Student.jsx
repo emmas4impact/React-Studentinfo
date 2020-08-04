@@ -15,31 +15,46 @@ import { connect } from "react-redux";
 const mapStateToProps = (state) => state;
 
 const mapDispatchToProps = (dispatch) => ({
-//   getStudent: (students) => {
-//     dispatch({
-//       type: "GET_STUDENT",
-//       payload: students,
-//     });
-// },
+
 
 getStudentThunk: (students) => dispatch(getStudentWithThunk(students)),
+getProjectThunk :(projects) => dispatch(getProjectWithThunk(projects))
 });
 const getStudentWithThunk = (students) => {
     
     return async(dispatch, getState) => {
-        const data= await fetch("http://localhost:3457/students")
+        const data= await fetch("http://localhost:3456/students")
         //students = await data.json()
         students  = await data.json()
-        console.log("hello", students)
+       
         console.log("A thunk was used to dispatch this action", getState());
         dispatch({
             type: "GET_STUDENT",
-            payload: students,
+            payload: students.Students,
         });
-      //async code
-      //debugger
+        console.log("hello", students)
+    
     };
   };
+  const getProjectWithThunk = (projects) => {
+    
+    return async(dispatch, getState) => {
+        const data= await fetch("http://localhost:3456/projects")
+        
+        projects = await data.json()
+       
+        console.log("A thunk was used to dispatch this action", getState());
+        dispatch({
+            type: "GET_PROJECT",
+            payload: projects.projects,
+        });
+        console.log("project", projects)
+     
+    };
+  };
+
+ 
+
 class Student extends Component {
     
     state={
@@ -61,8 +76,10 @@ class Student extends Component {
 
     }
     
-    componentDidMount = async () =>{
-        const response = await fetch("http://localhost:3457/students")
+    componentDidMount = async (id) =>{
+        this.props.getStudentThunk(id)
+        this.props.getProjectThunk(id)
+        const response = await fetch("http://localhost:3456/students")
         const data = await response.json()
         
         console.log(data)
@@ -71,7 +88,7 @@ class Student extends Component {
             Total: data.Total
         })
 
-        const resp = await fetch("http://localhost:3457/projects")
+        const resp = await fetch("http://localhost:3456/projects")
         const project = await resp.json()
         this.setState({
             
@@ -94,7 +111,7 @@ class Student extends Component {
      }
      saveStudent = async(e) =>{
         e.preventDefault()
-        const resp = await fetch("http://localhost:3457/students",{
+        const resp = await fetch("http://localhost:3456/students",{
             method: "POST",
             body: JSON.stringify(this.state.student),
             headers: {
@@ -147,7 +164,7 @@ class Student extends Component {
                <div style={{ display: "flex"}} onClick={this.handleShow}><Button>Add Student</Button></div>   
             </Jumbotron>
             <Row>
-              {this.state.students.map(student=>(
+              {this.props.data.students.map(student=>(
                 <Col md={4} className="mb-4"> 
                   <Card style={{ width: '18rem' }} key={student._id}>
                 <Card.Img variant="top" src="https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fd3v0px0pttie1i.cloudfront.net%2Fuploads%2Fuser%2Flogo%2F2760563%2Fopengraph_3b24453d.png%3Fsource%3Dopengraph" />
@@ -178,7 +195,7 @@ class Student extends Component {
                     <th>StudentID</th>
                     </tr>
                 </thead>
-                {this.state.Projects.map(project=>(
+                {this.props.data.projects.map(project=>(
                     
                     <tbody key={project._id}>
                     <tr>
