@@ -9,7 +9,9 @@ import  Row from 'react-bootstrap/Row';
 import  Col from 'react-bootstrap/Col';
 import {RiDeleteBin6Line} from 'react-icons/ri'
 import {FiEdit} from 'react-icons/fi'
+import { connect } from "react-redux";
 
+const mapStateToProps = (state) => state;
 class Project extends Component {
     
     state={
@@ -29,10 +31,10 @@ class Project extends Component {
         
     }
     
-    componentDidMount = async () =>{
-      
+    componentDidMount = async (id) =>{
+       //this.props.getProjectThunk() 
 
-        const resp = await fetch("http://localhost:3457/projects")
+        const resp = await fetch("http://localhost:3456/projects")
         const project = await resp.json()
         this.setState({
             
@@ -53,7 +55,7 @@ class Project extends Component {
     }
     saveProject = async(e) =>{
        e.preventDefault()
-       const resp = await fetch("http://localhost:3457/projects",{
+       const resp = await fetch("http://localhost:3456/projects",{
            method: "POST",
            body: JSON.stringify(this.state.project),
            headers: {
@@ -129,7 +131,7 @@ class Project extends Component {
                     <th>StudentID</th>
                     </tr>
                 </thead>
-                {this.state.Projects.map(project=>(
+                {this.props.data.projects.map(project=>(
                     
                     <tbody key={project._id}>
                     <tr>
@@ -212,4 +214,4 @@ class Project extends Component {
     }
 }
 
-export default Project;
+export default connect(mapStateToProps)(Project);
