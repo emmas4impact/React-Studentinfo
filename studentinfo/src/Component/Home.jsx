@@ -39,7 +39,7 @@ class Home extends Component {
     
     componentDidMount = async () =>{
         
-        const response = await fetch("http://localhost:3457/students")
+        const response = await fetch("http://localhost:3456/students")
         const data = await response.json()
         
         console.log(data)
@@ -49,7 +49,7 @@ class Home extends Component {
            //isLoading: this.props.isLoading()
         })
 
-        const resp = await fetch("http://localhost:3457/projects")
+        const resp = await fetch("http://localhost:3456/projects")
         const project = await resp.json()
         this.setState({
             
@@ -62,7 +62,7 @@ class Home extends Component {
         const skip = total - limit
         console.log("skip", skip)
         console.log("total", total)
-        const res = await fetch(`http://localhost:3457/projects?limit=${limit}&offset=${skip}`)
+        const res = await fetch(`http://localhost:3456/projects?limit=${limit}&offset=${skip}`)
         
         const lastPro =await res.json()
         this.setState({
